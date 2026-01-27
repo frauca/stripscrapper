@@ -1,9 +1,19 @@
 """Strip calculator - Combina classificacions de Cadet i Juvenil."""
 
 from typing import List, Dict, Tuple
+from dataclasses import dataclass
 from loguru import logger
 
 from stripscraper.models import TeamStats, Group, Classification
+
+
+@dataclass
+class TeamMatch:
+    nom_definitiu: str
+    nom_cadet: str
+    nom_juvenil: str
+    cadet_team: TeamStats
+    juvenil_team: TeamStats
 
 
 class StripCalculator:
@@ -83,22 +93,14 @@ class StripCalculator:
         return strip_classification
 
     def _combine_groups(self, cadet_group: Group, juvenil_group: Group, group_name: str) -> Group:
-        cadet_teams = {team.name: team for team in cadet_group.teams}
-        juvenil_teams = {team.name: team for team in juvenil_group.teams}
+        matches = self._match_teams(cadet_group.teams, juvenil_group.teams, group_name)
 
-        common_teams = set(cadet_teams.keys()) & set(juvenil_teams.keys())
-
-        if len(common_teams) == 0:
-            raise ValueError(f"Cap equip comú trobat al grup {group_name}")
-
-        logger.info(f"Grup {group_name}: {len(common_teams)} equips amb Cadet+Juvenil")
+        logger.info(f"Grup {group_name}: {len(matches)} equips amb Cadet+Juvenil")
 
         strip_teams = []
-        for team_name in common_teams:
-            cadet_team = cadet_teams[team_name]
-            juvenil_team = juvenil_teams[team_name]
-
-            strip_team = self._combine_teams(cadet_group,cadet_team, juvenil_team)
+        for match in matches:
+            strip_team = self._combine_teams(cadet_group, match.cadet_team, match.juvenil_team)
+            strip_team.name = match.nom_definitiu
             strip_teams.append(strip_team)
 
         strip_teams.sort(key=lambda t: (
@@ -118,6 +120,142 @@ class StripCalculator:
         )
 
         return strip_group
+
+    def _match_teams(self, cadet_teams: List[TeamStats], juvenil_teams: List[TeamStats], group_name: str) -> List[TeamMatch]:
+        if len(cadet_teams) != len(juvenil_teams):
+            raise ValueError(f"Grup {group_name}: diferent nombre d'equips (Cadet={len(cadet_teams)}, Juvenil={len(juvenil_teams)})")
+
+        cadet_normalized = [(i, team, self._normalize_name(team.name)) for i, team in enumerate(cadet_teams)]
+        juvenil_normalized = [(i, team, self._normalize_name(team.name)) for i, team in enumerate(juvenil_teams)]
+
+        matches = []
+        used_juvenil_idx = set()
+
+        for cadet_idx, cadet_team, cadet_norm in cadet_normalized:
+            for juvenil_idx, juvenil_team, juvenil_norm in juvenil_normalized:
+                if juvenil_idx in used_juvenil_idx:
+                    continue
+
+                if cadet_norm == juvenil_norm:
+                    nom_definitiu = self._get_definitive_name(cadet_team.name, juvenil_team.name)
+                    matches.append(TeamMatch(
+                        nom_definitiu=nom_definitiu,
+                        nom_cadet=cadet_team.name,
+                        nom_juvenil=juvenil_team.name,
+                        cadet_team=cadet_team,
+                        juvenil_team=juvenil_team
+                    ))
+                    used_juvenil_idx.add(juvenil_idx)
+                    logger.debug(f"  Match exacte: '{cadet_team.name}' ↔ '{juvenil_team.name}' → '{nom_definitiu}'")
+                    break
+
+        unmatched_cadet = [(idx, team) for idx, team, _ in cadet_normalized if not any(m.cadet_team == team for m in matches)]
+        unmatched_juvenil = [(idx, team) for idx, team, _ in juvenil_normalized if idx not in used_juvenil_idx]
+
+        if unmatched_cadet or unmatched_juvenil:
+            logger.warning(f"Grup {group_name}: {len(unmatched_cadet)} equips sense match exacte, intentant matching fuzzy...")
+            fuzzy_matches = self._fuzzy_match(unmatched_cadet, unmatched_juvenil, group_name)
+            matches.extend(fuzzy_matches)
+
+        if len(matches) != len(cadet_teams):
+            unmatched_cadet_names = [team.name for idx, team, _ in cadet_normalized if not any(m.cadet_team == team for m in matches)]
+            unmatched_juvenil_names = [team.name for idx, team, _ in juvenil_normalized if not any(m.juvenil_team == team for m in matches)]
+            logger.error(f"Grup {group_name} - Equips sense parella:")
+            logger.error(f"  Cadet: {unmatched_cadet_names}")
+            logger.error(f"  Juvenil: {unmatched_juvenil_names}")
+            raise ValueError(f"No s'han pogut emparellar tots els equips del grup {group_name}")
+
+        return matches
+
+    def _fuzzy_match(self, cadet_teams: List[Tuple[int, TeamStats]], juvenil_teams: List[Tuple[int, TeamStats]], group_name: str) -> List[TeamMatch]:
+        matches = []
+        used_juvenil_idx = set()
+
+        for cadet_idx, cadet_team in cadet_teams:
+            best_match = None
+            best_match_idx = None
+            best_score = 0
+
+            cadet_norm = self._normalize_name(cadet_team.name)
+            cadet_words = set(cadet_norm.split())
+
+            for juvenil_idx, juvenil_team in juvenil_teams:
+                if juvenil_idx in used_juvenil_idx:
+                    continue
+
+                juvenil_norm = self._normalize_name(juvenil_team.name)
+                juvenil_words = set(juvenil_norm.split())
+
+                common_words = cadet_words & juvenil_words
+
+                if not common_words:
+                    continue
+
+                min_words = min(len(cadet_words), len(juvenil_words))
+                max_words = max(len(cadet_words), len(juvenil_words))
+
+                word_score = len(common_words) / min_words
+
+                char_score = self._character_similarity(cadet_norm, juvenil_norm)
+
+                score = word_score * 0.8 + char_score * 0.2
+
+                if score > best_score:
+                    best_score = score
+                    best_match = juvenil_team
+                    best_match_idx = juvenil_idx
+
+            if best_match and best_score > 0.3:
+                nom_definitiu = self._get_definitive_name(cadet_team.name, best_match.name)
+                matches.append(TeamMatch(
+                    nom_definitiu=nom_definitiu,
+                    nom_cadet=cadet_team.name,
+                    nom_juvenil=best_match.name,
+                    cadet_team=cadet_team,
+                    juvenil_team=best_match
+                ))
+                used_juvenil_idx.add(best_match_idx)
+                logger.info(f"  Match fuzzy ({best_score:.2f}): '{cadet_team.name}' ↔ '{best_match.name}' → '{nom_definitiu}'")
+
+        return matches
+
+    def _character_similarity(self, s1: str, s2: str) -> float:
+        if not s1 or not s2:
+            return 0.0
+
+        longer = s1 if len(s1) >= len(s2) else s2
+        shorter = s2 if len(s1) >= len(s2) else s1
+
+        if len(longer) == 0:
+            return 1.0
+
+        matches = sum(1 for i, c in enumerate(shorter) if i < len(longer) and c == longer[i])
+        return matches / len(longer)
+
+    def _normalize_name(self, name: str) -> str:
+        import unicodedata
+
+        normalized = name.upper()
+        normalized = unicodedata.normalize('NFKD', normalized)
+        normalized = ''.join([c for c in normalized if not unicodedata.combining(c)])
+
+        normalized = ''.join([c if c.isalnum() or c.isspace() else ' ' for c in normalized])
+
+        words = normalized.split()
+        words = [w for w in words if w not in ['CADET', 'JUVENIL', 'JFG', 'CFG']]
+
+        return ' '.join(words).strip()
+
+    def _get_definitive_name(self, cadet_name: str, juvenil_name: str) -> str:
+        longer_name = cadet_name if len(cadet_name) >= len(juvenil_name) else juvenil_name
+
+        definitive = longer_name
+        for word in ['CADET', 'JUVENIL', 'Cadet', 'Juvenil', 'cadet', 'juvenil']:
+            definitive = definitive.replace(word, '')
+
+        definitive = ' '.join(definitive.split())
+
+        return definitive.strip()
 
     def _combine_teams(self, group: Group, cadet: TeamStats, juvenil: TeamStats) -> TeamStats:
         total_points = cadet.total_points + juvenil.total_points
