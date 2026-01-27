@@ -301,3 +301,25 @@ class StripCalculator:
 
     def _current_percentage(self, total_points: int, matches_played: int) -> float:
         return total_points / (matches_played * 3) * 100 if matches_played > 0 else 0
+
+    def _normalized_to_7(self, total_points: int, matches_played: int) -> float:
+        if matches_played == 0:
+            return 0
+        projected_points = (total_points / matches_played) * 7
+        return (projected_points / 21) * 100
+
+    def _normalized_with_penalty(self, total_points: int, matches_played: int) -> float:
+        if matches_played == 0:
+            return 0
+        projected_points = (total_points / matches_played) * 7
+        confidence = matches_played / 7
+        adjusted_points = projected_points * (0.7 + 0.3 * confidence)
+        return (adjusted_points / 21) * 100
+
+    def _weighted_difficulty(self, total_points: int, matches_played: int) -> float:
+        if matches_played == 0:
+            return 0
+        difficulty_multiplier = 1.0 + (matches_played - 6) * 0.05
+        weighted_points = total_points * difficulty_multiplier
+        normalized_points = (weighted_points / matches_played) * 7
+        return (normalized_points / 21) * 100
