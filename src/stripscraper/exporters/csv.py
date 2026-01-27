@@ -30,7 +30,7 @@ class CSVExporter:
             writer.writerow([
                 'Posició Global',
                 'Equip',
-                '% Punts',
+                'Classificació',
                 'Punts',
                 'Grup',
                 'Posició Grup',
@@ -49,7 +49,7 @@ class CSVExporter:
                 writer.writerow([
                     i,
                     team.stats.name,
-                    team.stats.points_percentage,
+                    f"{team.stats.points_percentage:.0f}",
                     team.stats.total_points,
                     team.group,
                     team.stats.position,

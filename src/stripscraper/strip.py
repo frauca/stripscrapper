@@ -98,10 +98,15 @@ class StripCalculator:
             cadet_team = cadet_teams[team_name]
             juvenil_team = juvenil_teams[team_name]
 
-            strip_team = self._combine_teams(cadet_team, juvenil_team)
+            strip_team = self._combine_teams(cadet_group,cadet_team, juvenil_team)
             strip_teams.append(strip_team)
 
-        strip_teams.sort(key=lambda t: t.total_points, reverse=True)
+        strip_teams.sort(key=lambda t: (
+                -t.points_percentage,
+                -t.matches_won,
+                -t.sets_difference,
+                -t.points_difference
+            ))
 
         for i, team in enumerate(strip_teams, start=1):
             team.position = i
@@ -114,7 +119,7 @@ class StripCalculator:
 
         return strip_group
 
-    def _combine_teams(self, cadet: TeamStats, juvenil: TeamStats) -> TeamStats:
+    def _combine_teams(self, group: Group, cadet: TeamStats, juvenil: TeamStats) -> TeamStats:
         total_points = cadet.total_points + juvenil.total_points
         matches_played = cadet.matches_played + juvenil.matches_played
         matches_won = cadet.matches_won + juvenil.matches_won
@@ -124,7 +129,7 @@ class StripCalculator:
         points_for = cadet.points_for + juvenil.points_for
         points_against = cadet.points_against + juvenil.points_against
 
-        points_percentage = total_points / (matches_played * 3) * 100 if matches_played > 0 else 0
+        points_percentage = self._current_percentage(total_points, len(group.teams)*4-4)
         win_percentage = (matches_won / matches_played) * 100 if matches_played > 0 else 0
         loss_percentage = (matches_lost / matches_played) * 100 if matches_played > 0 else 0
         avg_points_for = points_for / matches_played if matches_played > 0 else 0
@@ -155,3 +160,6 @@ class StripCalculator:
             defeats_1_point=cadet.defeats_1_point + juvenil.defeats_1_point,
             defeats_0_points=cadet.defeats_0_points + juvenil.defeats_0_points,
         )
+
+    def _current_percentage(self, total_points: int, matches_played: int) -> float:
+        return total_points / (matches_played * 3) * 100 if matches_played > 0 else 0
