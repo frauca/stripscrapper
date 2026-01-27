@@ -1,12 +1,10 @@
 """Competition scraper to get all classifications."""
 
 from typing import List, Set, Tuple
-from bs4 import BeautifulSoup
 from loguru import logger
-import httpx
-from urllib.parse import urljoin, parse_qs, urlparse
 
-from stripscraper.parser import ClassificationParser, Classification
+from stripscraper.models import Classification
+from stripscraper.parser import ClassificationParser
 
 
 class CompetitionScraper:
