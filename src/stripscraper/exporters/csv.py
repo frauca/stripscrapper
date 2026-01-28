@@ -30,7 +30,7 @@ class CSVExporter:
             writer.writerow([
                 'Posició Global',
                 'Equip',
-                'Classificació',
+                'Ponderat',
                 'Punts',
                 'Grup',
                 'Posició Grup',

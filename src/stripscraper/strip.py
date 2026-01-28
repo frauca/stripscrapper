@@ -323,3 +323,10 @@ class StripCalculator:
         weighted_points = total_points * difficulty_multiplier
         normalized_points = (weighted_points / matches_played) * 7
         return (normalized_points / 21) * 100
+
+    def _rounding_to_8(self, total_points: int, group_teams: int) -> float:
+        if group_teams == 8:
+            return total_points
+        if group_teams == 7:
+            return (total_points / 7) * 8
+        raise ValueError(f"Tenim un grup amb {group_teams} equips!")

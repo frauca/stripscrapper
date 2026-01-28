@@ -39,7 +39,7 @@ class PDFExporter:
         data = [[
             'Pos',
             'Equip',
-            'Class',
+            'Pond',
             'Punts',
             'Grup',
             'Pos Grup',

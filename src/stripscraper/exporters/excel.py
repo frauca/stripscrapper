@@ -32,7 +32,7 @@ class ExcelExporter:
         headers = [
             'Posició Global',
             'Equip',
-            'Classificació',
+            'Ponderat',
             'Punts',
             'Grup',
             'Posició Grup',
