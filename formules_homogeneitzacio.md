@@ -371,14 +371,3 @@ Si vols dades 100% reals:
 - Cada equip comparat amb el seu màxim real
 
 **PERÒ**: La volatilitat grup petit vs gran és real i inevitable.
-
-La federació probablement usa l'actual al final, i per això el teu programa ja està bé! 🏐
-
----
-
-## Conclusió Pràctica
-
-Per la vostra filla no importa quina fórmula uses DURANT la fase, perquè:
-1. Al final tots hauran jugat tots els partits
-2. La classificació final serà amb dades completes
-3. La volatilitat del grup petit és tant avantatge com desavantatge
