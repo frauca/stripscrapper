@@ -6,10 +6,9 @@ from typing import List, Optional
 class TeamStats:
     position: int
     name: str
-    url: str
     recent_form: str
     total_points: int
-    points_percentage: int
+    points_percentage: float
     matches_played: int
     matches_won: int
     win_percentage: int
@@ -72,7 +71,6 @@ class Group:
 
 @dataclass
 class Classification:
-    url: str
     competition: str
     category: str
     groups: List[Group] = field(default_factory=list)
@@ -120,7 +118,6 @@ class TeamWithContext:
 
 @dataclass
 class GlobalClassification:
-    url: str
     competition: str
     category: str
     teams: List[TeamWithContext] = field(default_factory=list)

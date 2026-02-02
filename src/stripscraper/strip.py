@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from loguru import logger
 
 from stripscraper.models import TeamStats, Group, Classification
-
+from stripscraper import formula
 
 @dataclass
 class TeamMatch:
@@ -71,7 +71,6 @@ class StripCalculator:
 
     def _combine_classifications(self, cadet: Classification, juvenil: Classification, division: str) -> Classification:
         strip_classification = Classification(
-            url="",
             competition=f"Tira {division}",
             category=f"Tira {division} Fem",
             groups=[]
@@ -267,7 +266,7 @@ class StripCalculator:
         points_for = cadet.points_for + juvenil.points_for
         points_against = cadet.points_against + juvenil.points_against
 
-        points_percentage = self._current_percentage(total_points, len(group.teams)*4-4)
+        points_percentage = formula.current_percentage(total_points, len(group.teams)*4 -4 )
         win_percentage = (matches_won / matches_played) * 100 if matches_played > 0 else 0
         loss_percentage = (matches_lost / matches_played) * 100 if matches_played > 0 else 0
         avg_points_for = points_for / matches_played if matches_played > 0 else 0
@@ -278,7 +277,6 @@ class StripCalculator:
         return TeamStats(
             position=0,
             name=cadet.name,
-            url=cadet.url,
             recent_form=recent_form,
             total_points=total_points,
             points_percentage=points_percentage,
@@ -299,34 +297,3 @@ class StripCalculator:
             defeats_0_points=cadet.defeats_0_points + juvenil.defeats_0_points,
         )
 
-    def _current_percentage(self, total_points: int, matches_played: int) -> float:
-        return total_points / (matches_played * 3) * 100 if matches_played > 0 else 0
-
-    def _normalized_to_7(self, total_points: int, matches_played: int) -> float:
-        if matches_played == 0:
-            return 0
-        projected_points = (total_points / matches_played) * 7
-        return (projected_points / 21) * 100
-
-    def _normalized_with_penalty(self, total_points: int, matches_played: int) -> float:
-        if matches_played == 0:
-            return 0
-        projected_points = (total_points / matches_played) * 7
-        confidence = matches_played / 7
-        adjusted_points = projected_points * (0.7 + 0.3 * confidence)
-        return (adjusted_points / 21) * 100
-
-    def _weighted_difficulty(self, total_points: int, matches_played: int) -> float:
-        if matches_played == 0:
-            return 0
-        difficulty_multiplier = 1.0 + (matches_played - 6) * 0.05
-        weighted_points = total_points * difficulty_multiplier
-        normalized_points = (weighted_points / matches_played) * 7
-        return (normalized_points / 21) * 100
-
-    def _rounding_to_8(self, total_points: int, group_teams: int) -> float:
-        if group_teams == 8:
-            return total_points
-        if group_teams == 7:
-            return (total_points / 7) * 8
-        raise ValueError(f"Tenim un grup amb {group_teams} equips!")

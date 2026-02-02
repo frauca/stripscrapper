@@ -38,7 +38,6 @@ class Classifier:
         )
 
         return GlobalClassification(
-            url=classification.url,
             competition=classification.competition,
             category=classification.category,
             teams=teams

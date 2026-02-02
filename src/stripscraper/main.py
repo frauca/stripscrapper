@@ -6,7 +6,7 @@ from stripscraper.classifier import Classifier
 from stripscraper.exporters.csv import CSVExporter
 from stripscraper.exporters.excel import ExcelExporter
 from stripscraper.exporters.pdf import PDFExporter
-from stripscraper.scraper import CompetitionScraper
+from stripscraper.scraper import FixedUrlsScraper as CompetitionScraper
 from stripscraper.strip import StripCalculator
 
 

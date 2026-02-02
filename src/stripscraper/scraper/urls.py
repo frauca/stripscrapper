@@ -4,13 +4,13 @@ from typing import List, Set, Tuple
 from loguru import logger
 
 from stripscraper.models import Classification
-from stripscraper.parser import ClassificationParser
+from stripscraper.parser import HttpxParser, PlaywrightParser
 
 
-class CompetitionScraper:
+class FixedUrlsScraper:
 
     def __init__(self):
-        self.parser = ClassificationParser()
+        self.parser = PlaywrightParser()
         self.urls = ["https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1746&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=171&id_competicion=549",
                      "https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1750&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=176&id_competicion=566",
                      "https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1975&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=173&id_competicion=551",
