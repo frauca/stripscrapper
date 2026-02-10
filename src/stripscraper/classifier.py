@@ -37,6 +37,9 @@ class Classifier:
             )
         )
 
+        for i, team in enumerate(teams, start=0):
+            team.stats.new_group = i % 4 +1
+
         return GlobalClassification(
             competition=classification.competition,
             category=classification.category,

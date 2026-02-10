@@ -295,5 +295,6 @@ class StripCalculator:
             victories_2_sets=cadet.victories_2_sets + juvenil.victories_2_sets,
             defeats_1_point=cadet.defeats_1_point + juvenil.defeats_1_point,
             defeats_0_points=cadet.defeats_0_points + juvenil.defeats_0_points,
+            new_group=0
         )
 

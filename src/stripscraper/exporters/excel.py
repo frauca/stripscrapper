@@ -35,6 +35,7 @@ class ExcelExporter:
             'Ponderat',
             'Punts',
             'Grup',
+            'Nou Grup',
             'Posició Grup',
             'Partits',
             'Victòries',
@@ -59,16 +60,17 @@ class ExcelExporter:
             ws.cell(row=i, column=3, value=int(team.stats.points_percentage))
             ws.cell(row=i, column=4, value=team.stats.total_points)
             ws.cell(row=i, column=5, value=team.group)
-            ws.cell(row=i, column=6, value=team.stats.position)
-            ws.cell(row=i, column=7, value=team.stats.matches_played)
-            ws.cell(row=i, column=8, value=team.stats.matches_won)
-            ws.cell(row=i, column=9, value=team.stats.matches_lost)
-            ws.cell(row=i, column=10, value=team.stats.sets_for)
-            ws.cell(row=i, column=11, value=team.stats.sets_against)
-            ws.cell(row=i, column=12, value=team.stats.sets_difference)
-            ws.cell(row=i, column=13, value=team.stats.points_for)
-            ws.cell(row=i, column=14, value=team.stats.points_against)
-            ws.cell(row=i, column=15, value=team.stats.points_difference)
+            ws.cell(row=i, column=6, value=int(team.stats.new_group))
+            ws.cell(row=i, column=7, value=team.stats.position)
+            ws.cell(row=i, column=8, value=team.stats.matches_played)
+            ws.cell(row=i, column=9, value=team.stats.matches_won)
+            ws.cell(row=i, column=10, value=team.stats.matches_lost)
+            ws.cell(row=i, column=11, value=team.stats.sets_for)
+            ws.cell(row=i, column=12, value=team.stats.sets_against)
+            ws.cell(row=i, column=13, value=team.stats.sets_difference)
+            ws.cell(row=i, column=14, value=team.stats.points_for)
+            ws.cell(row=i, column=15, value=team.stats.points_against)
+            ws.cell(row=i, column=16, value=team.stats.points_difference)
 
         for col in range(1, len(headers) + 1):
             ws.column_dimensions[chr(64 + col)].width = 15

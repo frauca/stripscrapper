@@ -24,6 +24,7 @@ class TeamStats:
     victories_2_sets: int
     defeats_1_point: int
     defeats_0_points: int
+    new_group: int
 
     @property
     def sets_difference(self) -> int:

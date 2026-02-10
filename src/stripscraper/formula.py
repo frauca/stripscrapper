@@ -31,5 +31,12 @@ def rounding_to_8(total_points: int, group_teams: int) -> float:
     if group_teams == 8:
         return total_points
     if group_teams == 7:
-        return (total_points / 7) * 8
+        return ( 8 / 7) * total_points
+    raise ValueError(f"Tenim un grup amb {group_teams} equips!")
+
+def rounding_to_7(total_points: int, group_teams: int) -> float:
+    if group_teams == 8:
+        return total_points
+    if group_teams == 7:
+        return ( 7 / 6) * total_points
     raise ValueError(f"Tenim un grup amb {group_teams} equips!")

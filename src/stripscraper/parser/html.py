@@ -156,4 +156,5 @@ class HtmlParser:
             victories_2_sets=safe_int(cols[12].get_text()),
             defeats_1_point=safe_int(cols[13].get_text()),
             defeats_0_points=safe_int(cols[14].get_text()) if len(cols) > 14 else 0,
+            new_group=0
         )
