@@ -50,7 +50,7 @@ Qui va primer? 🤔
 Utilitzem el **percentatge de punts** com a criteri principal:
 
 ```
-% Punts = (Punts obtinguts × 100) / (Total de partits del grup × 3)
+% Punts = (Punts obtinguts × 100) / (Partits jugats del equip × 3)
 ```
 
 **Ordre de classificació:**

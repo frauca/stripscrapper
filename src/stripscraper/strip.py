@@ -266,7 +266,7 @@ class StripCalculator:
         points_for = cadet.points_for + juvenil.points_for
         points_against = cadet.points_against + juvenil.points_against
 
-        points_percentage = formula.current_percentage(total_points, len(group.teams)*4 -4 )
+        points_percentage = formula.current_percentage(total_points, matches_played )
         win_percentage = (matches_won / matches_played) * 100 if matches_played > 0 else 0
         loss_percentage = (matches_lost / matches_played) * 100 if matches_played > 0 else 0
         avg_points_for = points_for / matches_played if matches_played > 0 else 0

@@ -50,7 +50,7 @@ class CSVExporter:
                 writer.writerow([
                     i,
                     team.stats.name,
-                    f"{team.stats.points_percentage:.0f}",
+                    f"{team.stats.points_percentage:.2f}",
                     team.stats.total_points,
                     team.group,
                     team.stats.new_group,

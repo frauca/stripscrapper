@@ -59,7 +59,7 @@ class PDFExporter:
             data.append([
                 str(i),
                 team.stats.name,
-                f"{team.stats.points_percentage:.0f}",
+                f"{team.stats.points_percentage:.2f}",
                 str(team.stats.total_points),
                 team.group,
                 str(team.stats.new_group),

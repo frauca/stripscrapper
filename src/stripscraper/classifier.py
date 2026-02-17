@@ -30,6 +30,7 @@ class Classifier:
 
         teams.sort(
             key=lambda t: (
+                t.stats.position,
                 -t.stats.points_percentage,
                 -t.stats.matches_won,
                 -t.stats.sets_difference,
@@ -37,11 +38,18 @@ class Classifier:
             )
         )
 
-        for i, team in enumerate(teams, start=0):
-            team.stats.new_group = i % 4 +1
+        self._snake_distribute(teams, 4)
 
         return GlobalClassification(
             competition=classification.competition,
             category=classification.category,
             teams=teams
         )
+
+    def _snake_distribute(self, teams: List[TeamWithContext], num_groups: int) -> None:
+        for i, team in enumerate(teams):
+            cycle_pos = i % (num_groups * 2)
+            if cycle_pos < num_groups:
+                team.stats.new_group = cycle_pos + 1
+            else:
+                team.stats.new_group = num_groups * 2 - cycle_pos
