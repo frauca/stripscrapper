@@ -60,7 +60,7 @@ class ExcelExporter:
             ws.cell(row=i, column=3, value=int(team.stats.points_percentage))
             ws.cell(row=i, column=4, value=team.stats.total_points)
             ws.cell(row=i, column=5, value=team.group)
-            ws.cell(row=i, column=6, value=int(team.stats.new_group))
+            ws.cell(row=i, column=6, value=team.phase_two)
             ws.cell(row=i, column=7, value=team.stats.position)
             ws.cell(row=i, column=8, value=team.stats.matches_played)
             ws.cell(row=i, column=9, value=team.stats.matches_won)

@@ -24,7 +24,6 @@ class TeamStats:
     victories_2_sets: int
     defeats_1_point: int
     defeats_0_points: int
-    new_group: int
 
     @property
     def sets_difference(self) -> int:
@@ -115,6 +114,7 @@ class TeamWithContext:
     competition: str
     category: str
     group: str
+    phase_two: str = ""
 
 
 @dataclass

@@ -9,12 +9,9 @@ from stripscraper.parser import HttpxParser, PlaywrightParser
 
 class FixedUrlsScraper:
 
-    def __init__(self):
+    def __init__(self, urls: List[str]):
         self.parser = PlaywrightParser()
-        self.urls = ["https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1746&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=171&id_competicion=549",
-                     "https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1750&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=176&id_competicion=566",
-                     "https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1975&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=173&id_competicion=551",
-                     "https://resultadosvoleibol.isquad.es/clasificacion_completa.php?seleccion=0&id=1977&id_ambito=0&id_territorial=17&id_superficie=1&iframe=0&id_categoria=178&id_competicion=568"]
+        self.urls = urls
 
     def scrape_all_categories(self) -> List[Classification]:
         logger.info("Scraping all category")

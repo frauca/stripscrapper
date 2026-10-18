@@ -53,7 +53,7 @@ class CSVExporter:
                     f"{team.stats.points_percentage:.2f}",
                     team.stats.total_points,
                     team.group,
-                    team.stats.new_group,
+                    team.phase_two,
                     team.stats.position,
                     team.stats.matches_played,
                     team.stats.matches_won,

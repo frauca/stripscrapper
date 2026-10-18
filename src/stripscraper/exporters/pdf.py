@@ -62,7 +62,7 @@ class PDFExporter:
                 f"{team.stats.points_percentage:.2f}",
                 str(team.stats.total_points),
                 team.group,
-                str(team.stats.new_group),
+                str(team.phase_two),
                 str(team.stats.position),
                 str(team.stats.matches_played),
                 str(team.stats.matches_won),

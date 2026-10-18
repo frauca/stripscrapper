@@ -2,25 +2,25 @@ from pathlib import Path
 
 from loguru import logger
 
-from stripscraper.classifier import Classifier
 from stripscraper.exporters.csv import CSVExporter
 from stripscraper.exporters.excel import ExcelExporter
 from stripscraper.exporters.pdf import PDFExporter
-from stripscraper.scraper import FixedUrlsScraper as CompetitionScraper
+from stripscraper.rules import EDITIONS
+from stripscraper.scraper import FixedUrlsScraper as CompetitionScraper, FixedUrlsScraper
 from stripscraper.strip import StripCalculator
 
 
 def main():
     logger.info("Iniciant web scraper per a fcvolei.cat")
+    edition = EDITIONS["2026_segona"]
 
-    scraper = CompetitionScraper()
+    scraper = FixedUrlsScraper(edition.urls)
     classifications = scraper.scrape_all_categories()
 
-    strip = StripCalculator()
+    strip = StripCalculator(edition)
     classifications = strip.calculate_strip_classifications(classifications)
 
-    classifier = Classifier()
-    classifications = classifier.classify(classifications)
+    classifications = edition.distribute(classifications)
 
     export_dir = Path("outputs")
 

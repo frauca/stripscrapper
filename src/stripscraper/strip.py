@@ -6,6 +6,8 @@ from loguru import logger
 
 from stripscraper.models import TeamStats, Group, Classification
 from stripscraper import formula
+from stripscraper.rules.base import Edition
+
 
 @dataclass
 class TeamMatch:
@@ -18,8 +20,9 @@ class TeamMatch:
 
 class StripCalculator:
 
-    def __init__(self):
+    def __init__(self,edition:Edition):
         logger.info("Initializing StripCalculator")
+        self.edition = edition
 
     def calculate_strip_classifications(self, classifications: List[Classification]) -> List[Classification]:
         logger.info("Calculant classificacions de tira...")
@@ -41,11 +44,12 @@ class StripCalculator:
         juvenil_by_div = {}
 
         for classification in classifications:
-            division = self._extract_division(classification.category)
+            category = classification.category.lower()
+            division = self._extract_division(category)
 
-            if "Cadet" in classification.category:
+            if "cad" in category:
                 cadet_by_div[division] = classification
-            elif "Juvenil" in classification.category:
+            elif "juv" in category:
                 juvenil_by_div[division] = classification
 
         divisions = {}
@@ -58,13 +62,13 @@ class StripCalculator:
         return divisions
 
     def _extract_division(self, category: str) -> str:
-        if "2a Div" in category:
+        if "2a div" in category:
             return "2a Div"
-        elif "4a Div" in category:
+        elif "4a div" in category:
             return "4a Div"
-        elif "3a Div" in category:
+        elif "3a div" in category:
             return "3a Div"
-        elif "1a Div" in category:
+        elif "1a div" in category:
             return "1a Div"
         else:
             raise ValueError(f"Divisió desconeguda a la categoria: {category}")
@@ -102,12 +106,7 @@ class StripCalculator:
             strip_team.name = match.nom_definitiu
             strip_teams.append(strip_team)
 
-        strip_teams.sort(key=lambda t: (
-                -t.points_percentage,
-                -t.matches_won,
-                -t.sets_difference,
-                -t.points_difference
-            ))
+        strip_teams.sort(key=lambda t: self.edition.ranking_key(t))
 
         for i, team in enumerate(strip_teams, start=1):
             team.position = i
@@ -294,7 +293,6 @@ class StripCalculator:
             victories_3_sets=cadet.victories_3_sets + juvenil.victories_3_sets,
             victories_2_sets=cadet.victories_2_sets + juvenil.victories_2_sets,
             defeats_1_point=cadet.defeats_1_point + juvenil.defeats_1_point,
-            defeats_0_points=cadet.defeats_0_points + juvenil.defeats_0_points,
-            new_group=0
+            defeats_0_points=cadet.defeats_0_points + juvenil.defeats_0_points
         )
 
